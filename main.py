@@ -7,10 +7,12 @@ from nltk.corpus import stopwords
 import numpy as np
 import matplotlib as plt
 
+kw_model = KeyBERT()
 data = pd.read_csv('./UoY.csv')
 
 data['combined'] = data['Outcome'].astype(str) + ' ' + data['Objective'] + ' ' + data['Description']
 data['preprocessed'] = ""
+data['keywords'] = ""
 
 # remove nan combined
 data = data[data['combined'].notna()]
@@ -33,8 +35,12 @@ for index, row in data.iterrows():
         words_set.add(lemmatized_token)
 
     data.at[index, 'preprocessed'] = ' '.join(map(str, lemmatized_list))
+    keywords = kw_model.extract_keywords(data.at[index, 'preprocessed'])
+    data.at[index, 'keywords'] = keywords
 
-print()
+data.to_csv('./tmp.csv')
+newData = pd.read_csv('./tmp.csv')
+
 # ini statistics
 
 # crate new col in each row for store keywords
